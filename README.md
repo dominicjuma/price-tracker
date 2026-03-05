@@ -218,7 +218,7 @@ com.multibankgroup.pricetracker/
 ## Build & Run
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/price-tracker.git
+git clone https://github.com/dominicjuma/price-tracker.git
 cd price-tracker
 
 ./gradlew assembleDebug
