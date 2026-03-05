@@ -3,8 +3,13 @@
 A real-time stock price tracker built with Jetpack Compose, WebSocket integration, and MVI-lite architecture. Displays live price updates for 25 stock symbols with a feed screen and symbol detail screen.
 
 ## Demo
+### Light Mode
 
-> TODO: Add screen recording GIF
+https://github.com/user-attachments/assets/9768d448-de1c-4560-8329-74781a6a4ab1 
+
+### Dark Mode
+
+https://github.com/user-attachments/assets/b47df03d-18d2-4ee7-b4c8-71423903cec9
 
 ## Requirements Checklist
 
@@ -39,42 +44,26 @@ A real-time stock price tracker built with Jetpack Compose, WebSocket integratio
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────┐
-│                     UI Layer                         │
-│  ┌──────────────┐         ┌───────────────┐         │
-│  │  FeedScreen   │         │ DetailScreen   │        │
-│  │  FeedContent  │         │ DetailContent  │        │
-│  └──────┬───────┘         └───────┬───────┘         │
-│         │                         │                  │
-│  ┌──────▼───────┐         ┌───────▼───────┐         │
-│  │ FeedViewModel │         │DetailViewModel │        │
-│  └──────┬───────┘         └───────┬───────┘         │
-├─────────┼─────────────────────────┼──────────────────┤
-│         │       Domain Layer      │                  │
-│         └────────┬────────────────┘                  │
-│          ┌───────▼────────┐                          │
-│          │ObserveStocksUse│                          │
-│          │     Case       │                          │
-│          └───────┬────────┘                          │
-├──────────────────┼───────────────────────────────────┤
-│                  │        Data Layer                  │
-│    ┌─────────────▼───────────────┐                   │
-│    │   StockPriceRepository (I)  │                   │
-│    │   StockPriceRepositoryImpl  │                   │
-│    └──┬──────────────────────┬───┘                   │
-│       │                      │                       │
-│  ┌────▼─────────┐    ┌──────▼──────────┐            │
-│  │StockPriceData│    │StockMetadata    │            │
-│  │Source (I)     │    │Repository (I)   │            │
-│  │WebSocket impl│    │Hardcoded impl   │            │
-│  └──────────────┘    └─────────────────┘            │
-├─────────────────────────────────────────────────────┤
-│                  Core Layer                          │
-│  Clock (I)  ConnectivityObserver (I)  Qualifiers    │
-│  CoreModule (Hilt: scope, dispatcher, clock, conn)  │
-└─────────────────────────────────────────────────────┘
-  (I) = interface — production impl via Hilt, fakes in tests
+```mermaid
+graph TD
+    subgraph UI Layer
+        FS[FeedScreen] --> FVM[FeedViewModel]
+        DS[DetailScreen] --> DVM[DetailViewModel]
+    end
+    subgraph Domain Layer
+        FVM --> UC[ObserveStocksUseCase]
+        DVM --> UC
+    end
+    subgraph Data Layer
+        UC --> SPR[StockPriceRepository]
+        UC --> SMR[StockMetadataRepository]
+        SPR --> WS[WebSocketDataSource]
+    end
+    subgraph Common
+        CO
+        CO[ConnectivityObserver]
+        CLK[Clock]
+    end
 ```
 
 ### Data Flow
@@ -125,7 +114,7 @@ Errors are events (show once, dismiss). `SharedFlow(extraBufferCapacity=1)` ensu
 Before retrying, checks `ConnectivityObserver.isOnline`. If offline, suspends via `first { it }` until connectivity returns, then retries with reset backoff. Prevents burning through exponential backoff while airplane mode is on.
 
 ### No Multi-Module
-Single module. For a 2-screen challenge, multi-module adds Gradle config overhead without payoff. In production with multiple teams: `:core`, `:data`, `:domain`, `:feature-feed`, `:feature-detail` with contract module pattern.
+Single module. For a 2-screen challenge, multi-module adds Gradle config overhead. In production with multiple teams: `:core`, `:data`, `:domain`, `:feature-feed`, `:feature-detail` with contract module pattern.
 
 ### No Room / No Offline
 Spec doesn't mention offline data persistence. Prices are transient (change every 2s). Adding Room would mean entities, DAOs, migrations — significant complexity for an unrequested feature.
@@ -166,8 +155,8 @@ src/androidTest/ (instrumented)
 ## Project Structure
 
 ```
-com.dominic.pricetracker/
-├── core/
+com.multibankgroup.pricetracker/
+├── common/
 │   ├── connectivity/
 │   │   ├── ConnectivityObserver.kt        Interface
 │   │   └── AndroidConnectivityObserver.kt
