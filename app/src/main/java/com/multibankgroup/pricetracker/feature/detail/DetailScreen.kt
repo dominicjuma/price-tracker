@@ -22,11 +22,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -68,7 +72,8 @@ fun DetailScreen(
 
     DetailContent(
         uiState = uiState,
-        onNavigateBack = onNavigateBack
+        onNavigateBack = onNavigateBack,
+        onDismissError = viewModel::onDismissError
     )
 }
 
@@ -77,13 +82,27 @@ fun DetailScreen(
 fun DetailContent(
     uiState: DetailUiState,
     onNavigateBack: () -> Unit,
+    onDismissError: () -> Unit,         // ← new
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    uiState.error?.let { error ->
+        val errorMessage = stringResource(error.messageResId)
+        LaunchedEffect(error) {
+            snackbarHostState.showSnackbar(
+                message = errorMessage,
+                duration = SnackbarDuration.Short
+            )
+            onDismissError()
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             DetailTopBar(
                 symbol = uiState.symbol,
@@ -92,24 +111,35 @@ fun DetailContent(
             )
         }
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(spacing.large),
-            verticalArrangement = Arrangement.spacedBy(spacing.large)
         ) {
-            PriceCard(
-                currentPrice = uiState.currentPrice,
-                previousPrice = uiState.previousPrice,
-                direction = uiState.priceDirection,
-                lastUpdatedTimestamp = uiState.lastUpdatedTimestamp
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(spacing.large),
+                verticalArrangement = Arrangement.spacedBy(spacing.large)
+            ) {
+                PriceCard(
+                    currentPrice = uiState.currentPrice,
+                    previousPrice = uiState.previousPrice,
+                    direction = uiState.priceDirection,
+                    lastUpdatedTimestamp = uiState.lastUpdatedTimestamp
+                )
 
-            AboutCard(description = uiState.description)
+                AboutCard(description = uiState.description)
 
-            DeepLinkHint(symbol = uiState.symbol)
+                DeepLinkHint(symbol = uiState.symbol)
+            }
+
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
         }
     }
 }

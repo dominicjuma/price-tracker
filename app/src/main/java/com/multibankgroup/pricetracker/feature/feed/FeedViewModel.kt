@@ -9,6 +9,7 @@ import com.multibankgroup.pricetracker.domain.ObserveStocksUseCase
 import com.multibankgroup.pricetracker.domain.model.Stock
 import com.multibankgroup.pricetracker.feature.shared_ui.model.StockDisplayItem
 import com.multibankgroup.pricetracker.feature.shared_ui.model.UiError
+import com.multibankgroup.pricetracker.feature.shared_ui.model.toUiError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -83,18 +84,6 @@ class FeedViewModel @Inject constructor(
                 _currentError.update { dataError.toUiError() }
             }
         }
-    }
-
-    // ──────────────────────────────────────────────────────────────────────
-    // Mapping
-    // ──────────────────────────────────────────────────────────────────────
-
-    private fun DataError.toUiError(): UiError = when (this) {
-        is DataError.ConnectionFailed -> UiError.CONNECTION_FAILED
-        is DataError.ConnectionLost -> UiError.CONNECTION_LOST
-        is DataError.ParseFailed -> UiError.PARSE_FAILED
-        is DataError.SerializationFailed -> UiError.PARSE_FAILED
-        DataError.NoInternet -> UiError.NO_INTERNET
     }
 
     private fun Stock.toDisplayItem(): StockDisplayItem {

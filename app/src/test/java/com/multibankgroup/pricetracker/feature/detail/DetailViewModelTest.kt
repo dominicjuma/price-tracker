@@ -40,7 +40,8 @@ class DetailViewModelTest {
     private fun createViewModel(symbol: String): DetailViewModel {
         return DetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("symbol" to symbol)),
-            observeStocksUseCase = useCase
+            observeStocksUseCase = useCase,
+            stockPriceRepository = fakeRepository
         )
     }
 
@@ -48,7 +49,8 @@ class DetailViewModelTest {
     fun `missing symbol in SavedStateHandle throws`() {
         DetailViewModel(
             savedStateHandle = SavedStateHandle(),
-            observeStocksUseCase = useCase
+            observeStocksUseCase = useCase,
+            stockPriceRepository = fakeRepository
         )
     }
 
