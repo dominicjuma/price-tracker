@@ -25,7 +25,7 @@ https://github.com/user-attachments/assets/b47df03d-18d2-4ee7-b4c8-71423903cec9
 ### Technical Expectations
 
 - [x] **100% Jetpack Compose** — no Views, no AndroidView
-- [x] **MVI-lite** — single immutable `UiState`, ViewModel functions for user actions, UDF
+- [x] **MVVM with UDF** — single immutable `UiState` via `StateFlow`, events flow up via ViewModel functions
 - [x] **Navigation Compose** with NavHost — type-safe `@Serializable` routes (Navigation 2.8+)
 - [x] **Kotlin Flow** — `callbackFlow` for WebSocket, `StateFlow` for state, `SharedFlow` for errors
 - [x] **Immutable UI state** — `@Immutable` data classes, `MutableStateFlow.update {}` for atomic mutations
@@ -85,7 +85,7 @@ UiError (enum + @StringRes) → Snackbar
 | Choice | Why | Alternative Considered |
 |--------|-----|----------------------|
 | **OkHttp WebSocket** | Standard Android HTTP client. `callbackFlow` bridges callbacks cleanly. | Ktor (extra engine), Scarlet (unmaintained) |
-| **MVI-lite** | Single `UiState` + function calls. No sealed Intent boilerplate. | Pure MVI (over-engineering for 2 screens) |
+| **MVVM with UDF** | Single `UiState` via `StateFlow`, events flow up via ViewModel functions. Follows Google's architecture guide. | Pure MVI with sealed Intents (over-engineering for 2 screens) |
 | **Domain UseCase** | Combines two repos + computes direction. Reused by both ViewModels. | No domain layer (duplicates logic) |
 | **Kotlinx Serialization** | No reflection, Kotlin-native, compile-time `@Serializable`. | Gson (reflection), Moshi (viable) |
 | **Type-safe Navigation 2.8+** | `@Serializable` routes = compile-time checking. | String routes (error-prone) |
@@ -94,30 +94,30 @@ UiError (enum + @StringRes) → Snackbar
 | **Clock injection** | No `System.currentTimeMillis()` in production. Deterministic tests. | Hardcoded timestamps in tests |
 | **`@IoDispatcher` injection** | JSON serialization on IO, not Default. Testable. | Hardcoded `Dispatchers.IO` |
 | **`Network` prefix on wire models** | Follows Now in Android convention. Instantly signals boundary. | No prefix (ambiguous in `data/model/`) |
-| **`core/` package** | Cross-cutting infra (Clock, Dispatcher, Connectivity) isn't data-layer. | Everything in `data/` (unclear ownership) |
+| **`common/` package** | Cross-cutting infra (Clock, Dispatcher, Connectivity) isn't data-layer. | Everything in `data/` (unclear ownership) |
 
 ## Key Tradeoffs
 
 ### Server-Authoritative Pricing
-Prices update ONLY on echo receipt, never on send. Adds network round-trip latency but ensures data consistency. Directly satisfies the spec.
+Prices update ONLY on echo receipt, never on send. The UI waits for server confirmation before reflecting changes — consistent with real-world trading systems where the server is the source of truth.
 
 ### Feed Toggle Without Disconnection
-Toggle pauses the ticker, keeps WebSocket open. Reconnection is expensive (backoff + handshake), so pausing sends is cheaper. Tradeoff: WebSocket stays open while paused.
+Toggle pauses the ticker but keeps the WebSocket open. Reconnection is expensive (backoff + handshake), so pausing sends is significantly cheaper. Tradeoff: idle WebSocket stays open while paused.
 
 ### Flash Animation in Draw Phase Only
-`Animatable<Color>` read inside `drawBehind` skips composition + layout entirely. With 25 rows flashing every 2s, this avoids 25 unnecessary recompositions per tick. Tradeoff: slightly more complex code (`Color.VectorConverter`).
+`Animatable<Color>` read inside `drawBehind` skips composition and layout entirely. With 25 rows flashing every 2s, this avoids 25 unnecessary recompositions per tick. Tradeoff: requires `Color.VectorConverter` setup.
 
 ### SharedFlow for Errors, StateFlow for State
-Errors are events (show once, dismiss). `SharedFlow(extraBufferCapacity=1)` ensures non-suspending emit. If nobody's collecting, the error drops — acceptable for transient UI messages.
+Errors are one-shot events (show once, dismiss), not persistent state. `SharedFlow(extraBufferCapacity=1)` ensures emit never suspends. If nobody is collecting, the error is dropped — acceptable for transient UI messages like Snackbars.
 
 ### Connectivity-Aware Retry
-Before retrying, checks `ConnectivityObserver.isOnline`. If offline, suspends via `first { it }` until connectivity returns, then retries with reset backoff. Prevents burning through exponential backoff while airplane mode is on.
+Before retrying, checks `ConnectivityObserver.isOnline`. If offline, suspends via `first { it }` until connectivity returns, then retries with reset backoff. Avoids wasting retry attempts while the device has no internet.
 
 ### No Multi-Module
-Single module. For a 2-screen challenge, multi-module adds Gradle config overhead. In production with multiple teams: `:core`, `:data`, `:domain`, `:feature-feed`, `:feature-detail` with contract module pattern.
+Single module. For a 2-screen app with one developer, multi-module adds Gradle configuration overhead without meaningful benefit. In production with multiple teams: `:common`, `:data`, `:domain`, `:feature-feed`, `:feature-detail` using the contract module pattern.
 
 ### No Room / No Offline
-Spec doesn't mention offline data persistence. Prices are transient (change every 2s). Adding Room would mean entities, DAOs, migrations — significant complexity for an unrequested feature.
+The spec does not require offline data persistence. Prices are transient by nature — they change every 2 seconds. Adding Room would introduce entities, DAOs, and migrations for a feature nobody requested.
 
 ## Testing Strategy
 
@@ -156,13 +156,19 @@ src/androidTest/ (instrumented)
 
 ```
 com.multibankgroup.pricetracker/
+├── app/
+│   ├── PriceTrackerApp.kt                @HiltAndroidApp
+│   ├── MainActivity.kt                   Single activity, edge-to-edge
+│   └── navigation/
+│       ├── Screen.kt                     @Serializable routes
+│       └── PriceTrackerNavGraph.kt       Type-safe NavHost + deep link
 ├── common/
 │   ├── connectivity/
 │   │   ├── ConnectivityObserver.kt        Interface
 │   │   └── AndroidConnectivityObserver.kt
 │   ├── di/
 │   │   ├── Qualifiers.kt                 @ApplicationScope, @IoDispatcher
-│   │   └── CoreModule.kt
+│   │   └── CommonModule.kt
 │   └── util/
 │       ├── Clock.kt                       Interface
 │       └── SystemClock.kt
@@ -188,31 +194,26 @@ com.multibankgroup.pricetracker/
 │   │   ├── PriceDirection.kt
 │   │   └── Stock.kt
 │   └── ObserveStocksUseCase.kt
-├── ui/
-│   ├── components/
-│   │   ├── ConnectionIndicator.kt
-│   │   ├── PriceChangeIndicator.kt
-│   │   └── StockRow.kt
-│   ├── detail/
-│   │   ├── DetailScreen.kt
-│   │   ├── DetailUiState.kt
-│   │   └── DetailViewModel.kt
-│   ├── feed/
-│   │   ├── FeedScreen.kt
-│   │   ├── FeedUiState.kt
-│   │   └── FeedViewModel.kt
-│   ├── model/UiError.kt
-│   ├── navigation/
-│   │   ├── Screen.kt
-│   │   └── NavGraph.kt
-│   └── theme/
-│       ├── Color.kt
-│       ├── StockColors.kt
-│       ├── Theme.kt
-│       └── Type.kt
-├── MainActivity.kt
-├── PriceTrackerApp.kt
-└── res/values/strings.xml
+└── feature/
+    ├── detail/
+    │   ├── DetailScreen.kt
+    │   ├── DetailUiState.kt
+    │   └── DetailViewModel.kt
+    ├── feed/
+    │   ├── FeedScreen.kt
+    │   ├── FeedUiState.kt
+    │   └── FeedViewModel.kt
+    └── shared_ui/
+        ├── components/
+        │   ├── ConnectionIndicator.kt
+        │   ├── PriceChangeIndicator.kt
+        │   └── StockRow.kt
+        ├── model/UiError.kt
+        └── theme/
+            ├── Color.kt
+            ├── StockColors.kt
+            ├── Theme.kt
+            └── Type.kt
 ```
 
 ## Build & Run
