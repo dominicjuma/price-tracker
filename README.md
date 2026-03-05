@@ -93,7 +93,7 @@ UiError (enum + @StringRes) → Snackbar
 | **Turbine** | `awaitItem()` is deterministic, tests emission ordering. | Manual collect + `.value` (race-prone) |
 | **Clock injection** | No `System.currentTimeMillis()` in production. Deterministic tests. | Hardcoded timestamps in tests |
 | **`@IoDispatcher` injection** | JSON serialization on IO, not Default. Testable. | Hardcoded `Dispatchers.IO` |
-| **`Network` prefix on wire models** | Follows Now in Android convention. Instantly signals boundary. | No prefix (ambiguous in `data/model/`) |
+| **`Network` prefix on wire models** | Instantly signals boundary. | No prefix (ambiguous in `data/model/`) |
 | **`common/` package** | Cross-cutting infra (Clock, Dispatcher, Connectivity) isn't data-layer. | Everything in `data/` (unclear ownership) |
 
 ## Key Tradeoffs
@@ -215,6 +215,28 @@ com.multibankgroup.pricetracker/
             ├── Theme.kt
             └── Type.kt
 ```
+
+## Production Considerations
+
+If this were a production app, the following would be added:
+
+- **Multi-module architecture** — `:common`, `:data`, `:domain`, `:feature-feed`, `:feature-detail` with contract module pattern (API + impl modules) for build time optimization and team parallel development
+- **Room persistence** — cache last-known prices for offline display and faster cold starts
+- **Pagination** — cursor-based pagination if the symbol list grows beyond a single screen load
+- **ProGuard/R8 rules** — keep rules for `@Serializable` classes and Kotlin reflection
+- **CI/CD** — GitHub Actions for lint, unit tests, instrumented tests on merge, staged rollout via Play Console
+- **Screenshot tests** — Compose Preview Screenshot Testing for visual regression detection
+- **Accessibility** — `contentDescription` on all interactive elements, TalkBack testing, minimum 48dp touch targets
+- **Analytics & crash reporting** — Firebase Crashlytics for production errors, analytics for feed engagement and detail screen visits
+- **Feature flags** — remote config to toggle WebSocket URL, ticker interval, and new features without app update
+- **Certificate pinning** — OkHttp `CertificatePinner` to prevent MITM attacks on the WebSocket connection
+- **Force upgrade** — version check on app launch to sunset old clients with breaking API changes
+- **Localization** — extract all strings (already done), add translations, handle RTL layouts
+- **Adaptive layouts** — tablet/foldable support with list-detail two-pane layout
+- **Performance monitoring** — baseline profiles for startup, Macrobenchmark for scroll performance
+- **Offline-first with sync** — Room as single source of truth, network writes to DB, UI reads from DB only. Optimistic UI updates with server reconciliation on sync
+- **Data integrity** — conflict resolution strategy (server wins with timestamp comparison), idempotency keys on outbound requests to prevent duplicate operations on retry
+- **Sync queue** — pending actions (e.g., watchlist changes) batched and sent when connectivity returns, with exponential backoff and deduplication
 
 ## Build & Run
 
