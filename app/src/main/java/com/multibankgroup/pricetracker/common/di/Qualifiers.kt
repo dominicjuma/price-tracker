@@ -1,4 +1,4 @@
-package com.multibankgroup.pricetracker.core.di
+package com.multibankgroup.pricetracker.common.di
 
 import javax.inject.Qualifier
 

@@ -1,7 +1,7 @@
 package com.multibankgroup.pricetracker.data.repository
 
-import com.multibankgroup.pricetracker.core.connectivity.ConnectivityObserver
-import com.multibankgroup.pricetracker.core.util.Clock
+import com.multibankgroup.pricetracker.common.connectivity.ConnectivityObserver
+import com.multibankgroup.pricetracker.common.util.Clock
 import com.multibankgroup.pricetracker.data.model.DataError
 import com.multibankgroup.pricetracker.data.model.NetworkStockPriceMessage
 import com.multibankgroup.pricetracker.data.model.NetworkSymbolPrice

@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.multibankgroup.pricetracker.ui.theme.PriceTrackerTheme
+import com.multibankgroup.pricetracker.feature.shared_ui.theme.PriceTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

@@ -1,4 +1,4 @@
-package com.multibankgroup.pricetracker.ui.theme
+package com.multibankgroup.pricetracker.feature.shared_ui.theme
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf

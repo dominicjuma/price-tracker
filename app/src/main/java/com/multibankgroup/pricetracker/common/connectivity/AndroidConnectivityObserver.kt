@@ -1,4 +1,4 @@
-package com.multibankgroup.pricetracker.core.connectivity
+package com.multibankgroup.pricetracker.common.connectivity
 
 import android.net.ConnectivityManager
 import android.net.ConnectivityManager.NetworkCallback

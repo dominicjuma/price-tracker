@@ -1,9 +1,9 @@
 package com.multibankgroup.pricetracker.data.di
 
-import com.multibankgroup.pricetracker.core.connectivity.ConnectivityObserver
-import com.multibankgroup.pricetracker.core.di.ApplicationScope
-import com.multibankgroup.pricetracker.core.di.IoDispatcher
-import com.multibankgroup.pricetracker.core.util.Clock
+import com.multibankgroup.pricetracker.common.connectivity.ConnectivityObserver
+import com.multibankgroup.pricetracker.common.di.ApplicationScope
+import com.multibankgroup.pricetracker.common.di.IoDispatcher
+import com.multibankgroup.pricetracker.common.util.Clock
 import com.multibankgroup.pricetracker.data.repository.StockMetadataRepository
 import com.multibankgroup.pricetracker.data.repository.StockMetadataRepositoryImpl
 import com.multibankgroup.pricetracker.data.repository.StockPriceRepository

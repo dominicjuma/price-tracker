@@ -1,7 +1,7 @@
 package com.multibankgroup.pricetracker.data.repository
 
-import com.multibankgroup.pricetracker.core.connectivity.FakeConnectivityObserver
-import com.multibankgroup.pricetracker.core.util.FakeClock
+import com.multibankgroup.pricetracker.common.connectivity.FakeConnectivityObserver
+import com.multibankgroup.pricetracker.common.util.FakeClock
 import com.multibankgroup.pricetracker.data.model.NetworkStockPriceMessage
 import com.multibankgroup.pricetracker.data.model.NetworkSymbolPrice
 import com.multibankgroup.pricetracker.data.websocket.ConnectionStatus
@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test

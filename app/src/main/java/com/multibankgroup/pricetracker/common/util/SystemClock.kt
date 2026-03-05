@@ -1,4 +1,4 @@
-package com.multibankgroup.pricetracker.core.util
+package com.multibankgroup.pricetracker.common.util
 
 /**
  * Production [Clock] backed by [System.currentTimeMillis].

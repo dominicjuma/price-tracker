@@ -1,11 +1,11 @@
-package com.multibankgroup.pricetracker.core.di
+package com.multibankgroup.pricetracker.common.di
 
 import android.content.Context
 import android.net.ConnectivityManager
-import com.multibankgroup.pricetracker.core.connectivity.AndroidConnectivityObserver
-import com.multibankgroup.pricetracker.core.connectivity.ConnectivityObserver
-import com.multibankgroup.pricetracker.core.util.Clock
-import com.multibankgroup.pricetracker.core.util.SystemClock
+import com.multibankgroup.pricetracker.common.connectivity.AndroidConnectivityObserver
+import com.multibankgroup.pricetracker.common.connectivity.ConnectivityObserver
+import com.multibankgroup.pricetracker.common.util.Clock
+import com.multibankgroup.pricetracker.common.util.SystemClock
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,7 +28,7 @@ import kotlinx.coroutines.SupervisorJob
  */
 @Module
 @InstallIn(SingletonComponent::class)
-object CoreModule {
+object CommonModule {
 
     @Provides
     @Singleton

@@ -1,4 +1,4 @@
-package com.multibankgroup.pricetracker.core.connectivity
+package com.multibankgroup.pricetracker.common.connectivity
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
