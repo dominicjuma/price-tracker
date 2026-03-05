@@ -7,32 +7,30 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.multibankgroup.pricetracker.domain.model.PriceDirection
 import com.multibankgroup.pricetracker.feature.shared_ui.model.StockDisplayItem
+import com.multibankgroup.pricetracker.feature.shared_ui.model.UiError
 import com.multibankgroup.pricetracker.feature.shared_ui.theme.PriceTrackerTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
-/**
- * Compose UI tests for the Feed screen.
- */
+/** Compose UI tests for the Feed screen. */
 class FeedScreenTest {
 
     @get:Rule
     val composeRule = createComposeRule()
 
+    // ── Stock rows ───────────────────────────────────────────────────
+
     @Test
     fun displaysStockSymbolsAndCompanyNames() {
-        val state = feedUiState(
-            stocks = listOf(
-                displayItem("AAPL", "Apple Inc.", currentPrice = 180.00),
-                displayItem("GOOG", "Alphabet Inc.", currentPrice = 140.00)
+        setFeedContent(
+            feedUiState(
+                stocks = listOf(
+                    displayItem("AAPL", "Apple Inc.", currentPrice = 180.00),
+                    displayItem("GOOG", "Alphabet Inc.", currentPrice = 140.00)
+                )
             )
         )
-        composeRule.setContent {
-            PriceTrackerTheme {
-                FeedContent(uiState = state, onToggleFeed = {}, onStockClick = {})
-            }
-        }
         composeRule.onNodeWithText("AAPL").assertIsDisplayed()
         composeRule.onNodeWithText("Apple Inc.").assertIsDisplayed()
         composeRule.onNodeWithText("GOOG").assertIsDisplayed()
@@ -41,102 +39,81 @@ class FeedScreenTest {
 
     @Test
     fun displaysFormattedPrices() {
-        val state = feedUiState(
-            stocks = listOf(displayItem("AAPL", "Apple Inc.", currentPrice = 178.50))
+        setFeedContent(
+            feedUiState(stocks = listOf(displayItem("AAPL", "Apple Inc.", currentPrice = 178.50)))
         )
-        composeRule.setContent {
-            PriceTrackerTheme {
-                FeedContent(uiState = state, onToggleFeed = {}, onStockClick = {})
-            }
-        }
         composeRule.onNodeWithText("$178.50").assertIsDisplayed()
     }
 
     @Test
     fun emptyStateShowsNoStockRows() {
-        composeRule.setContent {
-            PriceTrackerTheme {
-                FeedContent(uiState = feedUiState(), onToggleFeed = {}, onStockClick = {})
-            }
-        }
+        setFeedContent(feedUiState())
         composeRule.onNodeWithText("AAPL").assertDoesNotExist()
     }
 
     @Test
     fun rowsDisplayedInGivenOrder() {
-        val state = feedUiState(
-            stocks = listOf(
-                displayItem("NVDA", "NVIDIA Corporation", currentPrice = 900.00),
-                displayItem("AAPL", "Apple Inc.", currentPrice = 180.00),
-                displayItem("BAC", "Bank of America Corporation", currentPrice = 35.00)
+        setFeedContent(
+            feedUiState(
+                stocks = listOf(
+                    displayItem("NVDA", "NVIDIA Corporation", currentPrice = 900.00),
+                    displayItem("AAPL", "Apple Inc.", currentPrice = 180.00),
+                    displayItem("BAC", "Bank of America Corporation", currentPrice = 35.00)
+                )
             )
         )
-        composeRule.setContent {
-            PriceTrackerTheme {
-                FeedContent(uiState = state, onToggleFeed = {}, onStockClick = {})
-            }
-        }
         composeRule.onNodeWithText("NVDA").assertIsDisplayed()
         composeRule.onNodeWithText("AAPL").assertIsDisplayed()
         composeRule.onNodeWithText("BAC").assertIsDisplayed()
     }
 
+    // ── Connection indicator ─────────────────────────────────────────
+
     @Test
     fun showsLiveWhenConnected() {
-        composeRule.setContent {
-            PriceTrackerTheme {
-                FeedContent(uiState = feedUiState(isConnected = true), onToggleFeed = {}, onStockClick = {})
-            }
-        }
+        setFeedContent(feedUiState(isConnected = true))
         composeRule.onNodeWithText("Live").assertIsDisplayed()
     }
 
     @Test
     fun showsOfflineWhenDisconnected() {
-        composeRule.setContent {
-            PriceTrackerTheme {
-                FeedContent(uiState = feedUiState(isConnected = false), onToggleFeed = {}, onStockClick = {})
-            }
-        }
+        setFeedContent(feedUiState(isConnected = false))
         composeRule.onNodeWithText("Offline").assertIsDisplayed()
     }
 
+    // ── Feed toggle ──────────────────────────────────────────────────
+
     @Test
     fun feedLabelIsDisplayed() {
-        composeRule.setContent {
-            PriceTrackerTheme {
-                FeedContent(uiState = feedUiState(), onToggleFeed = {}, onStockClick = {})
-            }
-        }
+        setFeedContent(feedUiState())
         composeRule.onNodeWithText("Feed").assertIsDisplayed()
     }
 
     @Test
     fun toggleSwitchCallsOnToggleFeed() {
         var toggleCount = 0
-        composeRule.setContent {
-            PriceTrackerTheme {
-                FeedContent(uiState = feedUiState(isFeedActive = true), onToggleFeed = { toggleCount++ }, onStockClick = {})
-            }
-        }
+        setFeedContent(
+            uiState = feedUiState(isFeedActive = true),
+            onToggleFeed = { toggleCount++ }
+        )
         composeRule.onNode(isToggleable()).performClick()
         assertEquals(1, toggleCount)
     }
 
+    // ── Row click → navigation ───────────────────────────────────────
+
     @Test
     fun clickingRowCallsOnStockClickWithSymbol() {
         var clickedSymbol = ""
-        val state = feedUiState(
-            stocks = listOf(
-                displayItem("TSLA", "Tesla, Inc.", currentPrice = 245.00),
-                displayItem("AAPL", "Apple Inc.", currentPrice = 180.00)
-            )
+        setFeedContent(
+            uiState = feedUiState(
+                stocks = listOf(
+                    displayItem("TSLA", "Tesla, Inc.", currentPrice = 245.00),
+                    displayItem("AAPL", "Apple Inc.", currentPrice = 180.00)
+                )
+            ),
+            onStockClick = { clickedSymbol = it }
         )
-        composeRule.setContent {
-            PriceTrackerTheme {
-                FeedContent(uiState = state, onToggleFeed = {}, onStockClick = { clickedSymbol = it })
-            }
-        }
         composeRule.onNodeWithText("TSLA").performClick()
         assertEquals("TSLA", clickedSymbol)
     }
@@ -144,29 +121,63 @@ class FeedScreenTest {
     @Test
     fun clickingSecondRowNavigatesToCorrectSymbol() {
         var clickedSymbol = ""
-        val state = feedUiState(
-            stocks = listOf(
-                displayItem("AAPL", "Apple Inc.", currentPrice = 180.00),
-                displayItem("GOOG", "Alphabet Inc.", currentPrice = 140.00)
-            )
+        setFeedContent(
+            uiState = feedUiState(
+                stocks = listOf(
+                    displayItem("AAPL", "Apple Inc.", currentPrice = 180.00),
+                    displayItem("GOOG", "Alphabet Inc.", currentPrice = 140.00)
+                )
+            ),
+            onStockClick = { clickedSymbol = it }
         )
-        composeRule.setContent {
-            PriceTrackerTheme {
-                FeedContent(uiState = state, onToggleFeed = {}, onStockClick = { clickedSymbol = it })
-            }
-        }
         composeRule.onNodeWithText("GOOG").performClick()
         assertEquals("GOOG", clickedSymbol)
+    }
+
+    // ── Error Snackbar ───────────────────────────────────────────────
+
+    @Test
+    fun showsSnackbarWhenErrorPresent() {
+        setFeedContent(feedUiState(error = UiError.CONNECTION_LOST))
+        composeRule.onNodeWithText("Connection lost — reconnecting…").assertIsDisplayed()
+    }
+
+    @Test
+    fun showsNoInternetSnackbar() {
+        setFeedContent(feedUiState(error = UiError.NO_INTERNET))
+        composeRule.onNodeWithText("No internet connection").assertIsDisplayed()
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────
+
+    private fun setFeedContent(
+        uiState: FeedUiState,
+        onToggleFeed: () -> Unit = {},
+        onDismissError: () -> Unit = {},
+        onStockClick: (String) -> Unit = {}
+    ) {
+        composeRule.setContent {
+            PriceTrackerTheme {
+                FeedContent(
+                    uiState = uiState,
+                    onToggleFeed = onToggleFeed,
+                    onDismissError = onDismissError,
+                    onStockClick = onStockClick
+                )
+            }
+        }
     }
 
     private fun feedUiState(
         stocks: List<StockDisplayItem> = emptyList(),
         isConnected: Boolean = false,
-        isFeedActive: Boolean = true
+        isFeedActive: Boolean = true,
+        error: UiError? = null
     ) = FeedUiState(
         stocks = stocks,
         isConnected = isConnected,
-        isFeedActive = isFeedActive
+        isFeedActive = isFeedActive,
+        error = error
     )
 
     private fun displayItem(

@@ -16,7 +16,7 @@ class PriceTrackerApp : Application() {
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {
-            Timber.Forest.plant(Timber.DebugTree())
+            Timber.plant(Timber.DebugTree())
         }
     }
 }

@@ -12,13 +12,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -41,6 +46,7 @@ fun FeedScreen(
     FeedContent(
         uiState = uiState,
         onToggleFeed = viewModel::onToggleFeed,
+        onDismissError = viewModel::onDismissError,
         onStockClick = onNavigateToDetail
     )
 }
@@ -51,14 +57,30 @@ fun FeedScreen(
 fun FeedContent(
     uiState: FeedUiState,
     onToggleFeed: () -> Unit,
+    onDismissError: () -> Unit,
     onStockClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Show Snackbar when error arrives, clear ViewModel state when it dismisses
+    uiState.error?.let { error ->
+        val errorMessage = stringResource(error.messageResId)
+        LaunchedEffect(error) {
+            snackbarHostState.showSnackbar(
+                message = errorMessage,
+                duration = SnackbarDuration.Short
+            )
+            // Called on both auto-dismiss and user swipe
+            onDismissError()
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
