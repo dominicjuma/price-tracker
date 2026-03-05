@@ -50,6 +50,7 @@ class FeedViewModel @Inject constructor(
             isConnected = connectionStatus == ConnectionStatus.CONNECTED,
             isFeedActive = isFeedActive,
             isOnline = isOnline,
+            isLoading = stocks.isEmpty(),
             error = error
         )
     }.stateIn(

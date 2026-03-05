@@ -11,5 +11,6 @@ data class FeedUiState(
     val isConnected: Boolean = false,
     val isFeedActive: Boolean = true,
     val isOnline: Boolean = true,
+    val isLoading: Boolean = true,
     val error: UiError? = null
 )

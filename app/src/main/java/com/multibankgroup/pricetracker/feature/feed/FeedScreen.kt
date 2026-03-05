@@ -1,6 +1,7 @@
 package com.multibankgroup.pricetracker.feature.feed
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -99,20 +101,30 @@ fun FeedContent(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(bottom = spacing.medium)
+                .padding(paddingValues)
         ) {
-            items(
-                items = uiState.stocks,
-                key = { stock -> stock.symbol },
-                contentType = { "stock_row" }
-            ) { stock ->
-                StockRow(
-                    item = stock,
-                    onClick = { onStockClick(stock.symbol) }
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = spacing.medium)
+            ) {
+                items(
+                    items = uiState.stocks,
+                    key = { stock -> stock.symbol },
+                    contentType = { "stock_row" }
+                ) { stock ->
+                    StockRow(
+                        item = stock,
+                        onClick = { onStockClick(stock.symbol) }
+                    )
+                }
+            }
+
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
                 )
             }
         }

@@ -7,6 +7,7 @@ import com.multibankgroup.pricetracker.data.repository.StockMetadataRepositoryIm
 import com.multibankgroup.pricetracker.data.websocket.ConnectionStatus
 import com.multibankgroup.pricetracker.domain.ObserveStocksUseCase
 import com.multibankgroup.pricetracker.domain.model.PriceDirection
+import com.multibankgroup.pricetracker.feature.shared_ui.model.UiError
 import com.multibankgroup.pricetracker.test.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -54,6 +55,7 @@ class FeedViewModelTest {
             assertTrue(initial.stocks.isEmpty())
             assertFalse(initial.isConnected)
             assertTrue(initial.isFeedActive)
+            assertTrue(initial.isLoading)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -198,6 +200,30 @@ class FeedViewModelTest {
             assertEquals(PriceDirection.DOWN, items["GOOG"]!!.priceDirection)
             assertEquals(PriceDirection.NONE, items["MSFT"]!!.priceDirection)
 
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `isLoading is false when stocks are available`() = runTest {
+        viewModel.uiState.test {
+            skipItems(1)
+            fakeRepository.setPrices(
+                mapOf("AAPL" to stockData("AAPL", currentPrice = 180.00))
+            )
+            assertFalse(awaitItem().isLoading)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `onDismissError clears error from state`() = runTest {
+        viewModel.uiState.test {
+            skipItems(1)
+            fakeRepository.emitError(com.multibankgroup.pricetracker.data.model.DataError.NoInternet)
+            assertEquals(UiError.NO_INTERNET, awaitItem().error)
+            viewModel.onDismissError()
+            assertEquals(null, awaitItem().error)
             cancelAndIgnoreRemainingEvents()
         }
     }
