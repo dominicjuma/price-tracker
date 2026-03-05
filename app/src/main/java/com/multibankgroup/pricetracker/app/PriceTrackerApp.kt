@@ -1,6 +1,7 @@
-package com.multibankgroup.pricetracker
+package com.multibankgroup.pricetracker.app
 
 import android.app.Application
+import com.multibankgroup.pricetracker.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
@@ -15,7 +16,7 @@ class PriceTrackerApp : Application() {
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
+            Timber.Forest.plant(Timber.DebugTree())
         }
     }
 }
