@@ -1,3 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PriceTracker</string>
+
+    <!-- Feed screen -->
+    <string name="feed_label">Feed</string>
+
+    <!-- Connection indicator -->
+    <string name="connection_live">Live</string>
+    <string name="connection_offline">Offline</string>
+
+    <!-- Detail screen -->
+    <string name="detail_navigate_back">Back</string>
+    <string name="detail_section_current_price">CURRENT PRICE</string>
+    <string name="detail_price_context">vs previous tick</string>
+    <string name="detail_section_about">ABOUT</string>
+    <string name="detail_deep_link_copied">Copied to clipboard</string>
+
+    <!-- Price formatting -->
+    <string name="price_format">$%1$.2f</string>
+
+    <!-- Errors -->
+    <string name="error_connection_failed">Unable to connect to server</string>
+    <string name="error_connection_lost">Connection lost — reconnecting…</string>
+    <string name="error_no_internet">No internet connection</string>
+    <string name="error_parse_failed">Failed to process price update</string>
 </resources>
