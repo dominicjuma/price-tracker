@@ -6,8 +6,8 @@
     <string name="feed_label">Feed</string>
 
     <!-- Connection indicator -->
-    <string name="connection_live">Live</string>
-    <string name="connection_offline">Offline</string>
+    <string name="connection_live">Connected</string>
+    <string name="connection_offline">Disconnected</string>
 
     <!-- Detail screen -->
     <string name="detail_navigate_back">Back</string>

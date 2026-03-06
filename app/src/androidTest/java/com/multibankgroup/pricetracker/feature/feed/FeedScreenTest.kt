@@ -72,13 +72,13 @@ class FeedScreenTest {
     @Test
     fun showsLiveWhenConnected() {
         setFeedContent(feedUiState(isConnected = true))
-        composeRule.onNodeWithText("Live").assertIsDisplayed()
+        composeRule.onNodeWithText("Connected").assertIsDisplayed()
     }
 
     @Test
     fun showsOfflineWhenDisconnected() {
         setFeedContent(feedUiState(isConnected = false))
-        composeRule.onNodeWithText("Offline").assertIsDisplayed()
+        composeRule.onNodeWithText("Disconnected").assertIsDisplayed()
     }
 
     // ── Feed toggle ──────────────────────────────────────────────────
