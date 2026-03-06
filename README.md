@@ -5,11 +5,11 @@ A real-time stock price tracker built with Jetpack Compose, WebSocket integratio
 ## Demo
 ### Light Mode
 
-https://github.com/user-attachments/assets/9768d448-de1c-4560-8329-74781a6a4ab1 
+https://github.com/user-attachments/assets/2f1071a7-d001-4b23-a1a2-4ed9885680da
 
 ### Dark Mode
 
-https://github.com/user-attachments/assets/b47df03d-18d2-4ee7-b4c8-71423903cec9
+[https://github.com/user-attachments/assets/b47df03d-18d2-4ee7-b4c8-71423903cec9](https://github.com/user-attachments/assets/11e9aba3-280c-4d2a-bcd7-c4cde7c633dc)
 
 ## Requirements Checklist
 
