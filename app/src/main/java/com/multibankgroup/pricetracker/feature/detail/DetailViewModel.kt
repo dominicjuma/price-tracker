@@ -36,6 +36,7 @@ class DetailViewModel @Inject constructor(
     private val _currentError = MutableStateFlow<UiError?>(null)
 
     init {
+        stockPriceRepository.connect() //Idempotent — no-op if already connected.
         collectErrors()
     }
 
