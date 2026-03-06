@@ -18,6 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import android.content.res.Configuration
+import androidx.compose.ui.tooling.preview.Preview
+import com.multibankgroup.pricetracker.feature.shared_ui.theme.PriceTrackerTheme
 import com.multibankgroup.pricetracker.R
 import com.multibankgroup.pricetracker.feature.shared_ui.theme.LocalStockColors
 
@@ -65,5 +68,23 @@ fun ConnectionIndicator(
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(showBackground = false, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ConnectionIndicatorConnectedPreview() {
+    PriceTrackerTheme {
+        ConnectionIndicator(isConnected = true)
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(showBackground = false, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ConnectionIndicatorDisconnectedPreview() {
+    PriceTrackerTheme {
+        ConnectionIndicator(isConnected = false)
     }
 }

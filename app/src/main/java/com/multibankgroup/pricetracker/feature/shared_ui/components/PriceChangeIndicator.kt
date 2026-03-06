@@ -1,5 +1,6 @@
 package com.multibankgroup.pricetracker.feature.shared_ui.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -12,11 +13,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.multibankgroup.pricetracker.domain.model.PriceDirection
 import com.multibankgroup.pricetracker.feature.shared_ui.theme.LocalSpacing
 import com.multibankgroup.pricetracker.feature.shared_ui.theme.LocalStockColors
 import com.multibankgroup.pricetracker.feature.shared_ui.theme.PriceTrackerIcons
+import com.multibankgroup.pricetracker.feature.shared_ui.theme.PriceTrackerTheme
 import java.util.Locale
 
 /** Direction chip with icon + change amount. Early returns for NONE before any layout work. */
@@ -77,6 +80,33 @@ fun PriceChangeIndicator(
             text = changeText,
             style = MaterialTheme.typography.labelMedium,
             color = textColor
+        )
+    }
+}
+
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(showBackground = false, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PriceChangeIndicatorUpPreview() {
+    PriceTrackerTheme {
+        PriceChangeIndicator(
+            currentPrice = 178.50,
+            previousPrice = 175.00,
+            direction = PriceDirection.UP
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(showBackground = false, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PriceChangeIndicatorDownPreview() {
+    PriceTrackerTheme {
+        PriceChangeIndicator(
+            currentPrice = 170.00,
+            previousPrice = 178.50,
+            direction = PriceDirection.DOWN
         )
     }
 }

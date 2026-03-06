@@ -1,5 +1,6 @@
 package com.multibankgroup.pricetracker.feature.shared_ui.components
 
+import android.content.res.Configuration
 import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -25,6 +26,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.multibankgroup.pricetracker.R
 import com.multibankgroup.pricetracker.domain.model.PriceDirection
@@ -32,6 +34,7 @@ import com.multibankgroup.pricetracker.feature.shared_ui.model.StockDisplayItem
 import com.multibankgroup.pricetracker.feature.shared_ui.theme.LocalSpacing
 import com.multibankgroup.pricetracker.feature.shared_ui.theme.LocalStockColors
 import com.multibankgroup.pricetracker.feature.shared_ui.theme.PriceTrackerIcons
+import com.multibankgroup.pricetracker.feature.shared_ui.theme.PriceTrackerTheme
 import java.util.Locale
 
 private const val FLASH_DURATION_MS = 800
@@ -180,6 +183,25 @@ private fun PriceChangeText(
             } else {
                 color
             }
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(showBackground = false, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun StockRowPreview() {
+    PriceTrackerTheme {
+        StockRow(
+            item = StockDisplayItem(
+                symbol = "AAPL",
+                companyName = "Apple Inc.",
+                currentPrice = 178.50,
+                previousPrice = 175.00,
+                priceDirection = PriceDirection.UP,
+                lastUpdatedTimestamp = 1L
+            ),
+            onClick = {}
         )
     }
 }
