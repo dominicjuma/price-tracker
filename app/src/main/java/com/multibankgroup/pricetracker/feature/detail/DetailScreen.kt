@@ -287,12 +287,15 @@ private fun DeepLinkHint(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(spacing.mediumSmall))
-            .clickable {
-                val clipboard =
-                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                clipboard.setPrimaryClip(ClipData.newPlainText("deep link", deepLinkUri))
-                showCopied = true
-            }
+            .clickable(
+                onClick = {
+                    val clipboard =
+                        context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    clipboard.setPrimaryClip(ClipData.newPlainText("deep link", deepLinkUri))
+                    showCopied = true
+                },
+                onClickLabel = stringResource(R.string.action_copy_deep_link)
+            )
             .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f))
             .padding(horizontal = spacing.medium, vertical = spacing.mediumSmall),
         verticalAlignment = Alignment.CenterVertically,

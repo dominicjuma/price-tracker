@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.multibankgroup.pricetracker.R
@@ -74,7 +75,6 @@ fun FeedContent(
                 message = errorMessage,
                 duration = SnackbarDuration.Short
             )
-            // Called on both auto-dismiss and user swipe
             onDismissError()
         }
     }
@@ -117,7 +117,8 @@ fun FeedContent(
                 ) { stock ->
                     StockRow(
                         item = stock,
-                        onClick = { onStockClick(stock.symbol) }
+                        onClick = { onStockClick(stock.symbol) },
+                        onClickLabel = stringResource(R.string.action_view_details)
                     )
                 }
             }
@@ -131,7 +132,7 @@ fun FeedContent(
     }
 }
 
-/** Switch with "Feed" label. Green track = live. */
+/** Switch with "Feed" label. mergeDescendants so TalkBack reads "Feed, Switch, on" as one unit. */
 @Composable
 private fun FeedToggleSwitch(
     isFeedActive: Boolean,
@@ -142,7 +143,7 @@ private fun FeedToggleSwitch(
     val spacing = LocalSpacing.current
 
     Row(
-        modifier = modifier,
+        modifier = modifier.semantics(mergeDescendants = true) { },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(spacing.small)
     ) {

@@ -44,6 +44,7 @@ private const val FLASH_DURATION_MS = 800
 fun StockRow(
     item: StockDisplayItem,
     onClick: () -> Unit,
+    onClickLabel: String? = null,
     modifier: Modifier = Modifier
 ) {
     val stockColors = LocalStockColors.current
@@ -72,7 +73,10 @@ fun StockRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onClick)
+                .clickable(
+                    onClick = onClick,
+                    onClickLabel = onClickLabel
+                )
                 .drawBehind { drawRect(flashColor.value) }
                 .padding(horizontal = spacing.large, vertical = 14.dp),
             horizontalArrangement = Arrangement.SpaceBetween,

@@ -24,4 +24,8 @@
     <string name="error_connection_lost">Connection lost — reconnecting…</string>
     <string name="error_no_internet">No internet connection</string>
     <string name="error_parse_failed">Failed to process price update</string>
+
+    <!-- Content description -->
+    <string name="action_view_details">View details</string>
+    <string name="action_copy_deep_link">Copy deep link</string>
 </resources>

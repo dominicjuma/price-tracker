@@ -35,12 +35,13 @@ https://github.com/user-attachments/assets/b47df03d-18d2-4ee7-b4c8-71423903cec9
 
 ### Bonus
 
-- [x] **Price flash animation** — `Animatable<Color>` + `drawBehind` (draw phase only)
-- [x] **62 tests** — 41 local JVM + 21 instrumented, all fakes, no mocking framework
+- [x] **Price flash animation** — `Animatable<Color>` read inside `drawBehind`, so flash only triggers the draw phase — skips composition and layout for 25 rows every 2s
+- [x] **64 tests** — 41 local JVM + 23 instrumented, all fakes, no mocking framework
 - [x] **Light/dark themes** — Material 3 dynamic color, follows system
 - [x] **Deep link** — `stocks://symbol/{symbol}` via type-safe `navDeepLink<Detail>`
 - [x] **Structured error handling** — `DataError` → `UiError` mapping with localized strings
 - [x] **Connectivity-aware reconnection** — waits for internet before retrying
+- [x] **Accessibility** — `semantics(mergeDescendants)` for grouped controls, `onClickLabel` for TalkBack, `contentDescription` on all interactive icons
 
 ## Architecture
 
@@ -226,7 +227,6 @@ If this were a production app, the following would be added:
 - **ProGuard/R8 rules** — keep rules for `@Serializable` classes and Kotlin reflection
 - **CI/CD** — GitHub Actions for lint, unit tests, instrumented tests on merge, staged rollout via Play Console
 - **Screenshot tests** — Compose Preview Screenshot Testing for visual regression detection
-- **Accessibility** — `contentDescription` on all interactive elements, TalkBack testing, minimum 48dp touch targets
 - **Analytics & crash reporting** — Firebase Crashlytics for production errors, analytics for feed engagement and detail screen visits
 - **Feature flags** — remote config to toggle WebSocket URL, ticker interval, and new features without app update
 - **Certificate pinning** — OkHttp `CertificatePinner` to prevent MITM attacks on the WebSocket connection
